@@ -15,28 +15,39 @@ package br.uffs.cc.jarena;
 
 public class AgenteDecepticons extends Agente
 {
-
+	private static int contador = 0;
+	private boolean comandante;
 	private boolean recebendoEnergia;
 
 	public AgenteDecepticons(Integer x, Integer y, Integer energia) {
 		super(x, y, energia);
-		setDirecao(geraDirecaoAleatoria());
+		comandante = (contador++ == 0) ? true : false;
+
+		if (comandante) {
+			setDirecao(NENHUMA_DIRECAO);
+		} else {
+			setDirecao(geraDirecaoAleatoria());
+		}
 	}
 	
 	public void pensa() {
 		// Se não conseguimos nos mover para a direção atual, quer dizer
 		// que chegamos no final do mapa ou existe algo bloqueando nosso
 		// caminho.
-		if(!podeMoverPara(getDirecao())) {
-			// Como não conseguimos nos mover, vamos escolher uma direção
-			// nova.
-			setDirecao(geraDirecaoAleatoria());
+		if (!comandante) {
+			if(!podeMoverPara(getDirecao())) {
+				// Como não conseguimos nos mover, vamos escolher uma direção
+				// nova.
+				setDirecao(geraDirecaoAleatoria());
+			}
+	
+			if (!recebendoEnergia && isParado()) {
+				setDirecao(geraDirecaoAleatoria());
+			}
+			recebendoEnergia = false;
+		} else {
+			para();
 		}
-
-		if (!recebendoEnergia && isParado()) {
-			setDirecao(geraDirecaoAleatoria());
-		}
-		recebendoEnergia = false;
 		
 		// Se o agente conseguie se dividir (tem energia) e se o total de energia
 		// do agente é maior que 400, nos dividimos. O agente filho terá a metade
@@ -48,17 +59,20 @@ public class AgenteDecepticons extends Agente
 		// Invocado sempre que o agente recebe energia.
 		para();
 		recebendoEnergia = true;
+		enviaMensagem(getEquipe() + " [ENERGIA] posição: " + getX() + "," + getY());
 	}
 	
 	public void tomouDano(int energiaRestanteInimigo) {
 		// Invocado quando o agente está na mesma posição que um agente inimigo
 		// e eles estão batalhando (ambos tomam dano).
-		if(podeDividir()) {
+		if(podeDividir() && !comandante) {
 			divide();
+			para();
 		}
 
+		enviaMensagem(getEquipe() + " [INIMIGO] posição: " + getX() + "," + getY());
+
 		if (this.getEnergia() <= (Constants.ENTIDADE_COMBATE_DANO * 2) + (this.getDirecao() == Agente.NENHUMA_DIRECAO ? Constants.ENTIDADE_ENERGIA_GASTO_VIVER : (Constants.ENTIDADE_ENERGIA_GASTO_ANDAR + Constants.ENTIDADE_ENERGIA_GASTO_VIVER))) {
-			System.out.println(this.getId() + " morreu");
 			this.morre();
 		}
 	}
@@ -68,7 +82,11 @@ public class AgenteDecepticons extends Agente
 	}
 	
 	public void recebeuMensagem(String msg) {
-		// Invocado sempre que um agente aliado próximo envia uma mensagem.
+		if (msg.contains("[ENERGIA]")) {
+			String posicao = msg.split(":")[1];
+			String x = posicao.split(",")[0];
+			String y = posicao.split(",")[1];
+		}
 	}
 	
 	public String getEquipe() {
