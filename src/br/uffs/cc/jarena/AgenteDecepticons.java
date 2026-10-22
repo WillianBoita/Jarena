@@ -18,6 +18,8 @@ public class AgenteDecepticons extends Agente
 	private static int contador = 0;
 	private boolean comandante;
 	private boolean recebendoEnergia;
+	private int xEnergia = -1;
+	private int yEnergia = -1;
 
 	public AgenteDecepticons(Integer x, Integer y, Integer energia) {
 		super(x, y, energia);
@@ -35,6 +37,9 @@ public class AgenteDecepticons extends Agente
 		// que chegamos no final do mapa ou existe algo bloqueando nosso
 		// caminho.
 		if (!comandante) {
+			if (xEnergia != -1 && yEnergia != -1) {
+				System.out.println("Objetivo x,y" + xEnergia + "," + yEnergia);
+			}
 			if(!podeMoverPara(getDirecao())) {
 				// Como não conseguimos nos mover, vamos escolher uma direção
 				// nova.
@@ -72,8 +77,10 @@ public class AgenteDecepticons extends Agente
 
 		enviaMensagem(getEquipe() + " [INIMIGO] posição: " + getX() + "," + getY());
 
-		if (this.getEnergia() <= (Constants.ENTIDADE_COMBATE_DANO * 2) + (this.getDirecao() == Agente.NENHUMA_DIRECAO ? Constants.ENTIDADE_ENERGIA_GASTO_VIVER : (Constants.ENTIDADE_ENERGIA_GASTO_ANDAR + Constants.ENTIDADE_ENERGIA_GASTO_VIVER))) {
-			this.morre();
+		if (getEnergia() <= (Constants.ENTIDADE_COMBATE_DANO * 2)
+			+ (getDirecao() == Agente.NENHUMA_DIRECAO ? Constants.ENTIDADE_ENERGIA_GASTO_VIVER : (Constants.ENTIDADE_ENERGIA_GASTO_ANDAR + Constants.ENTIDADE_ENERGIA_GASTO_VIVER))) {
+			contador--;
+			morre();
 		}
 	}
 	
@@ -83,9 +90,11 @@ public class AgenteDecepticons extends Agente
 	
 	public void recebeuMensagem(String msg) {
 		if (msg.contains("[ENERGIA]")) {
-			String posicao = msg.split(":")[1];
-			String x = posicao.split(",")[0];
-			String y = posicao.split(",")[1];
+			String[] posicao = msg.split(":")[1].split(",");
+			int x = Integer.parseInt(posicao[0].trim());
+			int y = Integer.parseInt(posicao[1].trim());
+			xEnergia = x;
+			yEnergia = y;
 		}
 	}
 	
