@@ -64,7 +64,7 @@ public class AgenteDecepticons extends Agente
 		// Invocado sempre que o agente recebe energia.
 		para();
 		recebendoEnergia = true;
-		enviaMensagem(getEquipe() + " [ENERGIA] posição: " + getX() + "," + getY());
+		enviaMensagem(getId() + " [ENERGIA] posição: " + getX() + "," + getY());
 	}
 	
 	public void tomouDano(int energiaRestanteInimigo) {
@@ -75,7 +75,7 @@ public class AgenteDecepticons extends Agente
 			para();
 		}
 
-		enviaMensagem(getEquipe() + " [INIMIGO] posição: " + getX() + "," + getY());
+		enviaMensagem(getId() + " [INIMIGO] posição: " + getX() + "," + getY());
 
 		if (getEnergia() <= (Constants.ENTIDADE_COMBATE_DANO * 2)
 			+ (getDirecao() == Agente.NENHUMA_DIRECAO ? Constants.ENTIDADE_ENERGIA_GASTO_VIVER : (Constants.ENTIDADE_ENERGIA_GASTO_ANDAR + Constants.ENTIDADE_ENERGIA_GASTO_VIVER))) {
@@ -89,7 +89,7 @@ public class AgenteDecepticons extends Agente
 	}
 	
 	public void recebeuMensagem(String msg) {
-		if (msg.contains("[ENERGIA]")) {
+		if (msg.contains("[ENERGIA]") && !recebendoEnergia && !comandante) {
 			String[] posicao = msg.split(":")[1].split(",");
 			int x = Integer.parseInt(posicao[0].trim());
 			int y = Integer.parseInt(posicao[1].trim());
