@@ -112,6 +112,7 @@ public class AgenteDecepticons extends Agente
 	
 	public void ganhouCombate() {
 		// Invocado se estamos batalhando e nosso inimigo morreu.
+		moverPara(xEnergia, yEnergia);
 	}
 	
 	public void recebeuMensagem(String msg) {
