@@ -36,10 +36,11 @@ public class AgenteDecepticons extends Agente
 		// Se não conseguimos nos mover para a direção atual, quer dizer
 		// que chegamos no final do mapa ou existe algo bloqueando nosso
 		// caminho.
-		if (!comandante) {
+
+		if (!comandante && !recebendoEnergia) {
 			if (xEnergia != -1 && yEnergia != -1) {
 				moverPara(xEnergia, yEnergia);
-				if(!podeMoverPara(getDirecao())) {
+				if(!podeMoverPara(getDirecao()) && !isParado()) {
 					switch (getDirecao()) {
 						case Agente.DIREITA:
 							setDirecao(Agente.CIMA);
@@ -64,16 +65,19 @@ public class AgenteDecepticons extends Agente
 				}
 			}
 
-			if(!podeMoverPara(getDirecao())) {
+			if(!podeMoverPara(getDirecao()) && !isParado()) {
 				setDirecao(geraDirecaoAleatoria());
 			}
+
 			if (!recebendoEnergia && isParado()) {
 				moverPara(Constants.LARGURA_TELA / 2, Constants.ALTURA_TELA / 2);
 			}
-			recebendoEnergia = false;
+			
 		} else {
 			para();
 		}
+
+		recebendoEnergia = false;
 		
 		// Se o agente conseguie se dividir (tem energia) e se o total de energia
 		// do agente é maior que 400, nos dividimos. O agente filho terá a metade
@@ -130,6 +134,8 @@ public class AgenteDecepticons extends Agente
 		int diferencaY = y - getY();
 		int direcao;
 		if (diferencaX == 0 && diferencaY == 0) {
+			xEnergia = -1;
+			yEnergia = -1;
 			para();
 			return;
 		}
