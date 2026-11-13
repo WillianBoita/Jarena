@@ -38,18 +38,41 @@ public class AgenteDecepticons extends Agente
 		// caminho.
 		if (!comandante) {
 			if (xEnergia != -1 && yEnergia != -1) {
-				System.out.println("Objetivo x,y" + xEnergia + "," + yEnergia);
+				moverPara(xEnergia, yEnergia);
+				
+				if(!podeMoverPara(getDirecao())) {
+					switch (getDirecao()) {
+						case Agente.DIREITA:
+							setDirecao(Agente.CIMA);
+						break;
+
+						case Agente.CIMA:
+							setDirecao(Agente.DIREITA);
+						break;
+
+						case Agente.ESQUERDA:
+							setDirecao(Agente.BAIXO);
+						break;
+
+						case Agente.BAIXO:
+							setDirecao(Agente.ESQUERDA);
+						break;
+					
+						default:
+							setDirecao(geraDirecaoAleatoria());
+						break;
+					}
+				}
+			} else {
+				if(!podeMoverPara(getDirecao())) {
+					setDirecao(geraDirecaoAleatoria());
+				}
+		
+				if (!recebendoEnergia && isParado()) {
+					setDirecao(geraDirecaoAleatoria());
+				}
+				recebendoEnergia = false;
 			}
-			if(!podeMoverPara(getDirecao())) {
-				// Como não conseguimos nos mover, vamos escolher uma direção
-				// nova.
-				setDirecao(geraDirecaoAleatoria());
-			}
-	
-			if (!recebendoEnergia && isParado()) {
-				setDirecao(geraDirecaoAleatoria());
-			}
-			recebendoEnergia = false;
 		} else {
 			para();
 		}
@@ -101,5 +124,22 @@ public class AgenteDecepticons extends Agente
 	public String getEquipe() {
 		// Definimos que o nome da equipe do agente é "Decepticons".
 		return "Decepticons";
+	}
+
+	private void moverPara(int x, int y) {
+		int diferencaX = x - getX();
+		int diferencaY = y - getY();
+		int direcao;
+		if (diferencaX == 0 && diferencaY == 0) {
+			return;
+		}
+
+		if (Math.abs(diferencaX) > Math.abs(diferencaY)) {
+			direcao = diferencaX > 0 ? DIREITA : ESQUERDA;
+		} else {
+			direcao = diferencaY > 0 ? BAIXO : CIMA;
+		}
+
+		if (podeMoverPara(direcao)) setDirecao(direcao);
 	}
 }

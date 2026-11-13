@@ -6,11 +6,9 @@ Vamos ocupar a faixa central do mapa, sua borda é ditada pelo alcance da cura d
 
 ## Comandante
 
-O **Comandante** é responsável por repassar as mensagens dos *Soldados* aos outros *Soldados*, para organizar a estratégia e garantir um ponto seguro.
+O **Comandante** é responsável por  garantir um ponto seguro.
 
-*Nos testes, a Arena aparenta crashar quando um Agente tenta enviar uma mensagem recebida por outro Agente mesmo com limitadores, investigar a fundo.*
-
-É o único agente que não vai se dividir, e nem procurar cogumelos, seu objetivo é ajudar a coordenar o restante e sobreviver o máximo possível.
+É o único agente que não vai se dividir, e nem procurar cogumelos, seu objetivo é sobreviver o máximo possível.
 
 Caso seja atacado, irá mandar mensagem aos *Soldados*, que irão para a luta.
 
