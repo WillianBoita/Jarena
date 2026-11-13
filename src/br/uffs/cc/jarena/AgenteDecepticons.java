@@ -20,6 +20,7 @@ public class AgenteDecepticons extends Agente
 	private boolean recebendoEnergia;
 	private int xEnergia = -1;
 	private int yEnergia = -1;
+	private int contadorComandante = 0;
 
 	public AgenteDecepticons(Integer x, Integer y, Integer energia) {
 		super(x, y, energia);
@@ -27,6 +28,7 @@ public class AgenteDecepticons extends Agente
 
 		if (comandante) {
 			setDirecao(NENHUMA_DIRECAO);
+			para();
 		} else {
 			setDirecao(geraDirecaoAleatoria());
 		}
@@ -73,8 +75,6 @@ public class AgenteDecepticons extends Agente
 				moverPara(Constants.LARGURA_TELA / 2, Constants.ALTURA_TELA / 2);
 			}
 			
-		} else {
-			para();
 		}
 
 		recebendoEnergia = false;
@@ -99,6 +99,10 @@ public class AgenteDecepticons extends Agente
 		if(podeDividir() && !comandante) {
 			divide();
 			para();
+		}
+
+		if(comandante) {
+			moverPara(getX() + 1, getY());
 		}
 
 		enviaMensagem(getId() + " [INIMIGO] posição: " + getX() + "," + getY());
