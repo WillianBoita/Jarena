@@ -39,7 +39,6 @@ public class AgenteDecepticons extends Agente
 		if (!comandante) {
 			if (xEnergia != -1 && yEnergia != -1) {
 				moverPara(xEnergia, yEnergia);
-				
 				if(!podeMoverPara(getDirecao())) {
 					switch (getDirecao()) {
 						case Agente.DIREITA:
@@ -63,16 +62,15 @@ public class AgenteDecepticons extends Agente
 						break;
 					}
 				}
-			} else {
-				if(!podeMoverPara(getDirecao())) {
-					setDirecao(geraDirecaoAleatoria());
-				}
-		
-				if (!recebendoEnergia && isParado()) {
-					setDirecao(geraDirecaoAleatoria());
-				}
-				recebendoEnergia = false;
 			}
+
+			if(!podeMoverPara(getDirecao())) {
+				setDirecao(geraDirecaoAleatoria());
+			}
+			if (!recebendoEnergia && isParado()) {
+				moverPara(Constants.LARGURA_TELA / 2, Constants.ALTURA_TELA / 2);
+			}
+			recebendoEnergia = false;
 		} else {
 			para();
 		}
@@ -86,6 +84,7 @@ public class AgenteDecepticons extends Agente
 	public void recebeuEnergia() {
 		// Invocado sempre que o agente recebe energia.
 		para();
+		setDirecao(NENHUMA_DIRECAO);
 		recebendoEnergia = true;
 		enviaMensagem(getId() + " [ENERGIA] posição: " + getX() + "," + getY());
 	}
@@ -131,14 +130,21 @@ public class AgenteDecepticons extends Agente
 		int diferencaY = y - getY();
 		int direcao;
 		if (diferencaX == 0 && diferencaY == 0) {
+			para();
 			return;
 		}
 
-		if (Math.abs(diferencaX) > Math.abs(diferencaY)) {
-			direcao = diferencaX > 0 ? DIREITA : ESQUERDA;
-		} else {
-			direcao = diferencaY > 0 ? BAIXO : CIMA;
-		}
+		boolean priorizarDirecaoX = getId() % 2 == 0 ? true : false;
+
+		if (diferencaX == 0) {
+        direcao = diferencaY > 0 ? BAIXO : CIMA;
+    } else if (diferencaY == 0) {
+        direcao = diferencaX > 0 ? DIREITA : ESQUERDA;
+    } else if (priorizarDirecaoX) {
+        direcao = diferencaX > 0 ? DIREITA : ESQUERDA;
+    } else {
+        direcao = diferencaY > 0 ? BAIXO : CIMA;
+    }
 
 		if (podeMoverPara(direcao)) setDirecao(direcao);
 	}
