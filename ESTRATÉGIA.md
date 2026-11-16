@@ -11,6 +11,7 @@ O **Comandante** é responsável por garantir um ponto seguro.
 É o único agente que não vai se dividir, e nem procurar cogumelos, seu objetivo é sobreviver o máximo possível.
 
 Caso seja atacado por 2 turnos seguidos, ele irá começar uma fuga e tentar fugir.
+Caso seja alertado de um cogumelo próximo, irá até o local.
 
 ## Soldados
 
@@ -19,6 +20,8 @@ Sua função é ocupar os espaços laterais da área, e servir como "scout". Cas
 Sempre que receberem uma mensagem, irão apoiar os parceiros a não ser que estejam em um cogumelo.
 
 Caso os *Soldados* sejam atacados por 2 turnos, eles irão se dividir.
+
+5 irão patrulhar os cantos da borda, para aumentar o espaço coberto.
 
 ## Dividir para conquistar
 

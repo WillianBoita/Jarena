@@ -8,18 +8,34 @@
  
 /*
   Dupla: Willian Kronhardt Boita e Nicolas Kronhardt Boita
- 
+*/
+
+/*
+	Se o objeto a estiver à direita: a diferença é 49 pixels.
+	Se o objeto a estiver à esquerda: a diferença é -31 pixels.
+	Se o objeto a estiver acima: a diferença é -54 pixels.
+	Se o objeto a estiver abaixo: a diferença é 26 pixels.
 */
  
 package br.uffs.cc.jarena;
  
 public class AgenteDecepticons extends Agente
 {
+	private static int LIMITE_LARGURA_DIREITA = (int)(Constants.LARGURA_TELA * 0.95) - 45;
+	private static int LIMITE_LARGURA_ESQUERDA = 27;
+	private static int LIMITE_ALTURA_CIMA = 50;
+	private static int LIMITE_ALTURA_BAIXO = (int)(Constants.ALTURA_TELA * 0.95) - 22;
+
+
   private static int contador = 0;
+	private int agenteId;
+	private boolean posicionou = false;
+
   private boolean comandante;
+	private boolean soldadoBorda;
   private boolean recebendoEnergia = false;
   private boolean recebeuSinalEnergia = false;
-  private boolean foiAoMeio = false;
+  private boolean emPosicao = false;
   private int xEnergia = -1;
   private int yEnergia = -1;
   private int contadorCombate = 0;
@@ -27,13 +43,32 @@ public class AgenteDecepticons extends Agente
   public AgenteDecepticons(Integer x, Integer y, Integer energia) {
     super(x, y, energia);
     comandante = (contador++ == 0) ? true : false;
+		agenteId = contador;
+
+		if (agenteId == 2 || agenteId == 3 || agenteId == 4 || agenteId == 5) {
+			soldadoBorda = true;
+		}
  
-    if (comandante) {
-      setDirecao(NENHUMA_DIRECAO);
-      para();
-    } else {
-      moverPara((int)(Constants.LARGURA_TELA * 0.95) / 2, (int)(Constants.ALTURA_TELA * 0.95) / 2);
-    }
+	 	if (getX() == 0 && getY() == 0) {
+			xEnergia = LIMITE_LARGURA_ESQUERDA;
+			yEnergia = LIMITE_ALTURA_CIMA;
+			
+		} else if (getX() == (int)(Constants.LARGURA_TELA * 0.95) && getY() == 0) {
+			xEnergia = LIMITE_LARGURA_DIREITA;
+			yEnergia = LIMITE_ALTURA_CIMA;
+			
+		} else if (getX() == 0 && getY() == (int)(Constants.ALTURA_TELA * 0.95)) {
+			xEnergia = LIMITE_LARGURA_ESQUERDA;
+			yEnergia = LIMITE_ALTURA_BAIXO;
+			
+		} else if (getX() == (int)(Constants.LARGURA_TELA * 0.95) && getY() == (int)(Constants.ALTURA_TELA * 0.95)) {
+			xEnergia = LIMITE_LARGURA_DIREITA;
+			yEnergia = LIMITE_ALTURA_BAIXO;
+			
+		} else {
+			xEnergia = (LIMITE_LARGURA_ESQUERDA + LIMITE_LARGURA_DIREITA) / 2;
+			yEnergia = (LIMITE_ALTURA_BAIXO + LIMITE_ALTURA_CIMA) / 2;
+		}
   }
   
   public void pensa() {
@@ -41,52 +76,65 @@ public class AgenteDecepticons extends Agente
     if (contador < 2) {
       setDirecao(NENHUMA_DIRECAO);
       para();
-    } else {
+    } else if(posicionou) {
       if (contadorCombate <= 1 && comandante) {
         para();
       }
   
-      if (!comandante && !recebendoEnergia) {
+      if (!recebendoEnergia) {
         if (xEnergia != -1 && yEnergia != -1) {
           moverPara(xEnergia, yEnergia);
-          if(!podeMoverPara(getDirecao()) && !isParado()) {
-            switch (getDirecao()) {
-              case Agente.DIREITA:
-                setDirecao(Agente.CIMA);
-              break;
-  
-              case Agente.CIMA:
-                setDirecao(Agente.DIREITA);
-              break;
-  
-              case Agente.ESQUERDA:
-                setDirecao(Agente.BAIXO);
-              break;
-  
-              case Agente.BAIXO:
-                setDirecao(Agente.ESQUERDA);
-              break;
-            
-              default:
-                setDirecao(geraDirecaoAleatoria());
-              break;
-            }
-          }
         }
-        
-        if(!podeMoverPara(getDirecao()) && !isParado()) {
-          setDirecao(geraDirecaoAleatoria());
-        }
- 
-        if (!recebendoEnergia && !recebeuSinalEnergia) {
-          if (!estaNoMeio() && !foiAoMeio) {
-            moverPara((int)(Constants.LARGURA_TELA * 0.95) / 2, (int)(Constants.ALTURA_TELA * 0.95) / 2);
-          } else if (getDirecao() == NENHUMA_DIRECAO) {
+				
+        if (!comandante && !recebendoEnergia && !recebeuSinalEnergia) {
+					
+					if(!podeMoverPara(getDirecao()) && !isParado()) {
+						setDirecao(geraDirecaoAleatoria());
+					}
+
+					if (soldadoBorda && !podeMoverPara(getDirecao())) {
+						setDirecao(geraDirecaoAleatoria());
+					}
+
+          if (!estaNoMeio() && !emPosicao && !soldadoBorda) {
+						moverPara((LIMITE_LARGURA_ESQUERDA + LIMITE_LARGURA_DIREITA) / 2, (LIMITE_ALTURA_BAIXO + LIMITE_ALTURA_CIMA) / 2);
+					} else if (getDirecao() == NENHUMA_DIRECAO) {
             setDirecao(geraDirecaoAleatoria());
           }
+
+					if (getX() > LIMITE_LARGURA_DIREITA) {
+						if (Math.random() > 0.5) {
+							setDirecao(ESQUERDA);
+						} else {
+							setDirecao(BAIXO);
+						}
+
+					} else if (getX() < LIMITE_LARGURA_ESQUERDA) {
+						if (Math.random() > 0.5) {
+							setDirecao(DIREITA);
+						} else {
+							setDirecao(CIMA);
+						}
+
+					} if (getY() < LIMITE_ALTURA_CIMA) {
+						if (Math.random() > 0.5) {
+							setDirecao(BAIXO);
+						} else {
+							setDirecao(DIREITA);
+						}
+
+					} else if (getY() > LIMITE_ALTURA_BAIXO) {
+						if (Math.random() > 0.5) {
+							setDirecao(CIMA);
+						} else {
+							setDirecao(ESQUERDA);
+						}
+					}
+				}
         }
-      }
-    }
+    } else {
+			moverPara(xEnergia, yEnergia);
+		}
  
     recebeuSinalEnergia = false;
     recebendoEnergia = false;
@@ -98,8 +146,11 @@ public class AgenteDecepticons extends Agente
     para();
     setDirecao(NENHUMA_DIRECAO);
     recebendoEnergia = true;
-    foiAoMeio = false;
+    emPosicao = false;
     enviaMensagem(getId() + " [ENERGIA] posição: " + getX() + "," + getY());
+		if (!comandante && podeDividir() && getEnergia() > 600 && contador < 15) {
+			divide();
+		}
   }
   
   public void tomouDano(int energiaRestanteInimigo) {
@@ -135,7 +186,6 @@ public class AgenteDecepticons extends Agente
   
   public void ganhouCombate() {
     // Invocado se estamos batalhando e nosso inimigo morreu.
-    //moverPara(xEnergia, yEnergia);
   }
   
   public void recebeuMensagem(String msg) {
@@ -159,14 +209,15 @@ public class AgenteDecepticons extends Agente
     int diferencaY = y - getY();
  
     if (Math.abs(diferencaX) <= 5 && Math.abs(diferencaY) <= 5) {
-        xEnergia = -1;
-        yEnergia = -1;
-        setDirecao(NENHUMA_DIRECAO);
-        para();
-        return;
+			xEnergia = -1;
+			yEnergia = -1;
+			setDirecao(NENHUMA_DIRECAO);
+			para();
+			posicionou = true;
+			return;
     }
  
-    boolean priorizarDirecaoX = getId() % 3 == 0;
+    boolean priorizarDirecaoX = agenteId % 2 == 0;
  
     int direcao;
  
@@ -181,15 +232,16 @@ public class AgenteDecepticons extends Agente
     }
  
     if (podeMoverPara(direcao)) {
-        setDirecao(direcao);
+			setDirecao(direcao);
     }
   }
  
   private boolean estaNoMeio() {
-    int meioX = (int)(Constants.LARGURA_TELA * 0.95) / 2;
-    int meioY = (int)(Constants.ALTURA_TELA * 0.95) / 2;
+    int meioX = (LIMITE_LARGURA_ESQUERDA + LIMITE_LARGURA_DIREITA) / 2;
+    int meioY = (LIMITE_ALTURA_BAIXO + LIMITE_ALTURA_CIMA) / 2;
     if (Math.abs(meioX - getX()) <= 5 && Math.abs(meioY - getY()) <= 5) {
-      foiAoMeio = true;
+			setDirecao(NENHUMA_DIRECAO);
+      emPosicao = true;
       return true;
     }
  
