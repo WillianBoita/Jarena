@@ -21,6 +21,10 @@ package br.uffs.cc.jarena;
  
 public class AgenteDecepticons extends Agente
 {
+  // não pode variável static :(
+  // reescrever toda a lógica do comandante e dos soldados, encontrar uma maneira de descobrir o id de cada um.
+  // tentar tirar vantagem do spawn onde todos estão juntos, cada um manda um id.
+
 	private static int LIMITE_LARGURA_DIREITA = (int)(Constants.LARGURA_TELA * 0.95) - 45;
 	private static int LIMITE_LARGURA_ESQUERDA = 27;
 	private static int LIMITE_ALTURA_CIMA = 50;
