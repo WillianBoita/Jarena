@@ -20,17 +20,20 @@ public class AgenteDecepticons extends Agente
 	private boolean recebendoEnergia;
 	private int xEnergia = -1;
 	private int yEnergia = -1;
-	private int contadorComandante = 0;
+	private int contadorCombate = 0;
 
 	public AgenteDecepticons(Integer x, Integer y, Integer energia) {
 		super(x, y, energia);
 		comandante = (contador++ == 0) ? true : false;
 
 		if (comandante) {
-			setDirecao(NENHUMA_DIRECAO);
 			para();
 		} else {
-			setDirecao(geraDirecaoAleatoria());
+			if (Math.random() > 0.5) {
+				setDirecao(geraDirecaoAleatoria());
+			} else {
+				moverPara(Constants.LARGURA_TELA / 2, Constants.ALTURA_TELA / 2);
+			}
 		}
 	}
 	
@@ -39,45 +42,55 @@ public class AgenteDecepticons extends Agente
 		// que chegamos no final do mapa ou existe algo bloqueando nosso
 		// caminho.
 
-		if (!comandante && !recebendoEnergia) {
-			if (xEnergia != -1 && yEnergia != -1) {
-				moverPara(xEnergia, yEnergia);
-				if(!podeMoverPara(getDirecao()) && !isParado()) {
-					switch (getDirecao()) {
-						case Agente.DIREITA:
-							setDirecao(Agente.CIMA);
-						break;
-
-						case Agente.CIMA:
-							setDirecao(Agente.DIREITA);
-						break;
-
-						case Agente.ESQUERDA:
-							setDirecao(Agente.BAIXO);
-						break;
-
-						case Agente.BAIXO:
-							setDirecao(Agente.ESQUERDA);
-						break;
-					
-						default:
-							setDirecao(geraDirecaoAleatoria());
-						break;
+		if (contador < 2) {
+			para();
+		} else {
+			if (contadorCombate <= 1 && comandante) {
+				para();
+			}
+	
+			if (!comandante && !recebendoEnergia) {
+				if (xEnergia != -1 && yEnergia != -1) {
+					moverPara(xEnergia, yEnergia);
+					if(!podeMoverPara(getDirecao()) && !isParado()) {
+						switch (getDirecao()) {
+							case Agente.DIREITA:
+								setDirecao(Agente.CIMA);
+							break;
+	
+							case Agente.CIMA:
+								setDirecao(Agente.DIREITA);
+							break;
+	
+							case Agente.ESQUERDA:
+								setDirecao(Agente.BAIXO);
+							break;
+	
+							case Agente.BAIXO:
+								setDirecao(Agente.ESQUERDA);
+							break;
+						
+							default:
+								setDirecao(geraDirecaoAleatoria());
+							break;
+						}
 					}
 				}
+	
+				if(!podeMoverPara(getDirecao()) && !isParado()) {
+					setDirecao(geraDirecaoAleatoria());
+				}
+	
+				if (!recebendoEnergia && isParado()) {
+					moverPara(Constants.LARGURA_TELA / 2, Constants.ALTURA_TELA / 2);
+				}
+				
 			}
-
-			if(!podeMoverPara(getDirecao()) && !isParado()) {
-				setDirecao(geraDirecaoAleatoria());
-			}
-
-			if (!recebendoEnergia && isParado()) {
-				moverPara(Constants.LARGURA_TELA / 2, Constants.ALTURA_TELA / 2);
-			}
-			
 		}
 
+
 		recebendoEnergia = false;
+		contadorCombate = 0;
 		
 		// Se o agente conseguie se dividir (tem energia) e se o total de energia
 		// do agente é maior que 400, nos dividimos. O agente filho terá a metade
@@ -96,19 +109,29 @@ public class AgenteDecepticons extends Agente
 	public void tomouDano(int energiaRestanteInimigo) {
 		// Invocado quando o agente está na mesma posição que um agente inimigo
 		// e eles estão batalhando (ambos tomam dano).
-		if(podeDividir() && !comandante) {
+		contadorCombate++;
+
+		if (!comandante) {
+			setDirecao(geraDirecaoAleatoria());
+		}
+
+		if(podeDividir() && !comandante && contadorCombate > 1) {
 			divide();
 			para();
 		}
 
-		if(comandante) {
-			moverPara(getX() + 1, getY());
+		if(comandante && contadorCombate > 1) {
+			if (Math.random() > 0.5) {
+				moverPara(getX(), getY() + Constants.ENTIDADE_VELOCIDADE);
+			} else {
+				moverPara(getX() + Constants.ENTIDADE_VELOCIDADE, getY());
+			}
 		}
 
 		enviaMensagem(getId() + " [INIMIGO] posição: " + getX() + "," + getY());
 
 		if (getEnergia() <= (Constants.ENTIDADE_COMBATE_DANO * 2)
-			+ (getDirecao() == Agente.NENHUMA_DIRECAO ? Constants.ENTIDADE_ENERGIA_GASTO_VIVER : (Constants.ENTIDADE_ENERGIA_GASTO_ANDAR + Constants.ENTIDADE_ENERGIA_GASTO_VIVER))) {
+			+ (getDirecao() == Agente.NENHUMA_DIRECAO ? Constants.ENTIDADE_ENERGIA_GASTO_VIVER : (Constants.ENTIDADE_ENERGIA_GASTO_ANDAR + Constants.ENTIDADE_ENERGIA_GASTO_VIVER)) && contador > 1) {
 			contador--;
 			morre();
 		}
