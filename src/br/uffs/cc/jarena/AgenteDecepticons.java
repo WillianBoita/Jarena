@@ -80,11 +80,6 @@ public class AgenteDecepticons extends Agente
 				if(!podeMoverPara(getDirecao()) && !isParado()) {
 					setDirecao(geraDirecaoAleatoria());
 				}
-	
-				if (!recebendoEnergia && isParado()) {
-					moverPara(Constants.LARGURA_TELA / 2, Constants.ALTURA_TELA / 2);
-				}
-				
 			}
 		}
 
@@ -115,7 +110,7 @@ public class AgenteDecepticons extends Agente
 			setDirecao(geraDirecaoAleatoria());
 		}
 
-		if(podeDividir() && !comandante && contadorCombate > 1) {
+		if(podeDividir() && !comandante) {
 			divide();
 			para();
 		}
