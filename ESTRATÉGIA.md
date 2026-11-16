@@ -2,30 +2,31 @@
 
 ## Movimentação
 
-Vamos ocupar a faixa central do mapa, sua borda é ditada pelo alcance da cura dos cogumelos * 2. O **Comandante** vai ocupar o centro absoluto, enquanto os *Soldados* vão ocupar as laterais.
+**Comandante** vai permanecer fixo, enquanto os *Soldados* vão patrulhar a arena em busca de cogumelos.
 
 ## Comandante
 
-O **Comandante** é responsável por  garantir um ponto seguro.
+O **Comandante** é responsável por garantir um ponto seguro.
 
 É o único agente que não vai se dividir, e nem procurar cogumelos, seu objetivo é sobreviver o máximo possível.
 
-Caso seja atacado, irá mandar mensagem aos *Soldados*, que irão para a luta.
+Caso seja atacado por 2 turnos seguidos, ele irá começar uma fuga e tentar fugir.
 
 ## Soldados
 
-Sua função é ocupar os espaços laterais da área, e servir como "scout". Caso encontre cogumelos ou agentes inimigos, irá alertar o restante de sua posição.
+Sua função é ocupar os espaços laterais da área, e servir como "scout". Caso encontre cogumelos, irá alertar o restante de sua posição.
 
 Sempre que receberem uma mensagem, irão apoiar os parceiros a não ser que estejam em um cogumelo.
 
-A ordem de prioridade das mensagens é a seguinte: 1 - Cogumelo, 2 - **Comandante** em ataque, 3 - Soldado em ataque (pode ser alterada)
+Caso os *Soldados* sejam atacados por 2 turnos, eles irão se dividir.
 
 ## Dividir para conquistar
 
-Bem no estilo de ordenações de listas, o objetivo é sempre que for encontrado um cogumelo ou inimigo, os *Soldados* se dividem o máximo possível (limite a ser definido).
+Bem no estilo de ordenações de listas, o objetivo é sempre que for encontrado um inimigo, os *Soldados* se dividem o máximo possível (limite a ser definido).
 Como a maioria dos agentes inimigos apenas mede a vida do adversário, vamos aproveitar-se disso e dividir, para dar a impressão de uma vitória fácil, quando na verdade estamos com uma vantagem numérica.
-Na mesma lógica, os agentes inimigos vão fazer a estratégia ao redor dos cogumelos. Vários agentes consomem um cogumelo mais rápido, e os *Soldados* vão dividir se para "drenar" o cogumelo e impedir que o adversário use os pontos de vida do cogumelo.
 
-## Final do jogo
+## Suicídio
 
-Quando não houverem mais cogumelos, os *Soldados* vão a caça dos inimigos restantes, enquanto o **Comandante** permanece parado, para tentar durar o máximo possível.
+Foi notado nos testes que quando uma unidade morre, os inimigos recebem pontos de energia, e queremos evitar isso.
+Utilizamos um cálculo envolvendo o dano da unidade inimiga, e um buffer a mais para mandar a unidade se matar e impedir que o inimigo ganhe pontos.
+Isso apenas se aplica se tem mais de uma unidade em campo.
