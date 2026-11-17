@@ -24,6 +24,7 @@ public class AgenteDecepticons extends Agente
   // não pode variável static :(
   // reescrever toda a lógica do comandante e dos soldados, encontrar uma maneira de descobrir o id de cada um.
   // tentar tirar vantagem do spawn onde todos estão juntos, cada um manda um id.
+  // ideia, criar vetor de ids, e povoar com mensagens recebidas de cada agente.
 
 	private static int LIMITE_LARGURA_DIREITA = (int)(Constants.LARGURA_TELA * 0.95) - 45;
 	private static int LIMITE_LARGURA_ESQUERDA = 27;
@@ -34,6 +35,8 @@ public class AgenteDecepticons extends Agente
   private static int contador = 0;
 	private int agenteId;
 	private boolean posicionou = false;
+  private boolean sinalizouId = false;
+  private String[] agenteIds;
 
   private boolean comandante;
 	private boolean soldadoBorda;
@@ -76,6 +79,11 @@ public class AgenteDecepticons extends Agente
   }
   
   public void pensa() {
+
+    if (!sinalizouId) {
+      enviaMensagem("[ID] -" + getId());
+      sinalizouId = true;
+    }
  
     if (contador < 2) {
       setDirecao(NENHUMA_DIRECAO);
