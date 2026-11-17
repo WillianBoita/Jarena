@@ -34,15 +34,16 @@ public class AgenteDecepticons extends Agente
 
   private static int contador = 0;
 	private int agenteId;
+  private String[] agenteIds;
 	private boolean posicionou = false;
   private boolean sinalizouId = false;
-  private String[] agenteIds;
 
   private boolean comandante;
 	private boolean soldadoBorda;
   private boolean recebendoEnergia = false;
   private boolean recebeuSinalEnergia = false;
   private boolean emPosicao = false;
+  private boolean fugindo = false;
   private int xEnergia = -1;
   private int yEnergia = -1;
   private int contadorCombate = 0;
@@ -80,14 +81,6 @@ public class AgenteDecepticons extends Agente
   
   public void pensa() {
 
-    if(comandante && contadorCombate > 1) {
-      if (Math.random() > 0.5) {
-        moverPara(getX(), getY() + Constants.ENTIDADE_VELOCIDADE);
-      } else {
-        moverPara(getX() + Constants.ENTIDADE_VELOCIDADE, getY());
-      }
-    }
-
     if (!sinalizouId) {
       enviaMensagem("[ID] -" + getId());
       sinalizouId = true;
@@ -97,9 +90,18 @@ public class AgenteDecepticons extends Agente
       setDirecao(NENHUMA_DIRECAO);
       para();
     } else if(posicionou) {
-      if (contadorCombate <= 1 && comandante) {
+      if (contadorCombate <= 1 && comandante && !fugindo) {
         para();
       }
+
+      if (fugindo && comandante) {
+      System.out.println("comandante tentou fugir");
+      if (Math.random() > 0.5) {
+        moverPara(getX(), getY() + Constants.ENTIDADE_VELOCIDADE);
+      } else {
+        moverPara(getX() + Constants.ENTIDADE_VELOCIDADE, getY());
+      }
+    }
   
       if (!recebendoEnergia) {
         if (xEnergia != -1 && yEnergia != -1) {
@@ -150,15 +152,16 @@ public class AgenteDecepticons extends Agente
 							setDirecao(ESQUERDA);
 						}
 					}
+
 				}
-        }
+      }
     } else {
 			moverPara(xEnergia, yEnergia);
 		}
  
     recebeuSinalEnergia = false;
     recebendoEnergia = false;
-    contadorCombate = 0;
+    fugindo = false;
   }
   
   public void recebeuEnergia() {
@@ -176,16 +179,25 @@ public class AgenteDecepticons extends Agente
   public void tomouDano(int energiaRestanteInimigo) {
     // Invocado quando o agente está na mesma posição que um agente inimigo
     // e eles estão batalhando (ambos tomam dano).
-    contadorCombate++;
- 
-    if (!comandante) {
-      para();
-      if (podeDividir() && getEnergia() > 300) {
-        divide();
+    
+    if (posicionou) {
+      contadorCombate++;
+      if(comandante && contadorCombate > 1) {
+        contadorCombate = 0;
+        fugindo = true;
       }
+   
+      if (!comandante) {
+        para();
+        setDirecao(NENHUMA_DIRECAO);
+        if (podeDividir() && contadorCombate > 1) {
+          divide();
+        }
+      }
+   
+      enviaMensagem(getId() + " [INIMIGO] posição: " + getX() + "," + getY());
     }
- 
-    enviaMensagem(getId() + " [INIMIGO] posição: " + getX() + "," + getY());
+
  
     if (getEnergia() <= (Constants.ENTIDADE_COMBATE_DANO * 2)
       + (getDirecao() == Agente.NENHUMA_DIRECAO ? Constants.ENTIDADE_ENERGIA_GASTO_VIVER : (Constants.ENTIDADE_ENERGIA_GASTO_ANDAR + Constants.ENTIDADE_ENERGIA_GASTO_VIVER)) && contador > 1) {
@@ -195,6 +207,7 @@ public class AgenteDecepticons extends Agente
   }
   
   public void ganhouCombate() {
+    contadorCombate = 0;
     // Invocado se estamos batalhando e nosso inimigo morreu.
   }
   
