@@ -80,6 +80,14 @@ public class AgenteDecepticons extends Agente
   
   public void pensa() {
 
+    if(comandante && contadorCombate > 1) {
+      if (Math.random() > 0.5) {
+        moverPara(getX(), getY() + Constants.ENTIDADE_VELOCIDADE);
+      } else {
+        moverPara(getX() + Constants.ENTIDADE_VELOCIDADE, getY());
+      }
+    }
+
     if (!sinalizouId) {
       enviaMensagem("[ID] -" + getId());
       sinalizouId = true;
@@ -171,19 +179,9 @@ public class AgenteDecepticons extends Agente
     contadorCombate++;
  
     if (!comandante) {
-      setDirecao(geraDirecaoAleatoria());
-    }
- 
-    if(podeDividir() && !comandante) {
-      divide();
       para();
-    }
- 
-    if(comandante && contadorCombate > 1) {
-      if (Math.random() > 0.5) {
-        moverPara(getX(), getY() + Constants.ENTIDADE_VELOCIDADE);
-      } else {
-        moverPara(getX() + Constants.ENTIDADE_VELOCIDADE, getY());
+      if (podeDividir() && getEnergia() > 300) {
+        divide();
       }
     }
  
