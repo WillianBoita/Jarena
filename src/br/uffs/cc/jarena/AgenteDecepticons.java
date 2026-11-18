@@ -18,6 +18,9 @@
 */
  
 package br.uffs.cc.jarena;
+
+import java.util.ArrayList;
+import java.util.Arrays;
  
 public class AgenteDecepticons extends Agente
 {
@@ -26,15 +29,13 @@ public class AgenteDecepticons extends Agente
   // tentar tirar vantagem do spawn onde todos estão juntos, cada um manda um id.
   // ideia, criar vetor de ids, e povoar com mensagens recebidas de cada agente.
 
-	private static int LIMITE_LARGURA_DIREITA = (int)(Constants.LARGURA_TELA * 0.95) - 45;
-	private static int LIMITE_LARGURA_ESQUERDA = 27;
-	private static int LIMITE_ALTURA_CIMA = 50;
-	private static int LIMITE_ALTURA_BAIXO = (int)(Constants.ALTURA_TELA * 0.95) - 22;
+	private int LIMITE_LARGURA_DIREITA = (int)(Constants.LARGURA_TELA * 0.95) - 45;
+	private int LIMITE_LARGURA_ESQUERDA = 27;
+	private int LIMITE_ALTURA_CIMA = 50;
+	private int LIMITE_ALTURA_BAIXO = (int)(Constants.ALTURA_TELA * 0.95) - 22;
 
-
-  private static int contador = 0;
 	private int agenteId;
-  private String[] agenteIds;
+  private ArrayList<String> agenteIds = new ArrayList<>();
 	private boolean posicionou = false;
   private boolean sinalizouId = false;
 
@@ -50,8 +51,6 @@ public class AgenteDecepticons extends Agente
  
   public AgenteDecepticons(Integer x, Integer y, Integer energia) {
     super(x, y, energia);
-    comandante = (contador++ == 0) ? true : false;
-		agenteId = contador;
 
 		if (agenteId == 2 || agenteId == 3 || agenteId == 4 || agenteId == 5) {
 			soldadoBorda = true;
@@ -86,10 +85,7 @@ public class AgenteDecepticons extends Agente
       sinalizouId = true;
     }
  
-    if (contador < 2) {
-      setDirecao(NENHUMA_DIRECAO);
-      para();
-    } else if(posicionou) {
+    if(posicionou) {
       if (contadorCombate <= 1 && comandante && !fugindo) {
         para();
       }
@@ -101,6 +97,9 @@ public class AgenteDecepticons extends Agente
       } else {
         moverPara(getX() + Constants.ENTIDADE_VELOCIDADE, getY());
       }
+    } else {
+      setDirecao(NENHUMA_DIRECAO);
+      para();
     }
   
       if (!recebendoEnergia) {
@@ -171,7 +170,7 @@ public class AgenteDecepticons extends Agente
     recebendoEnergia = true;
     emPosicao = false;
     enviaMensagem(getId() + " [ENERGIA] posição: " + getX() + "," + getY());
-		if (!comandante && podeDividir() && getEnergia() > 600 && contador < 15) {
+		if (!comandante && podeDividir() && getEnergia() > 600) {
 			divide();
 		}
   }
@@ -200,8 +199,7 @@ public class AgenteDecepticons extends Agente
 
  
     if (getEnergia() <= (Constants.ENTIDADE_COMBATE_DANO * 2)
-      + (getDirecao() == Agente.NENHUMA_DIRECAO ? Constants.ENTIDADE_ENERGIA_GASTO_VIVER : (Constants.ENTIDADE_ENERGIA_GASTO_ANDAR + Constants.ENTIDADE_ENERGIA_GASTO_VIVER)) && contador > 1) {
-      contador--;
+      + (getDirecao() == Agente.NENHUMA_DIRECAO ? Constants.ENTIDADE_ENERGIA_GASTO_VIVER : (Constants.ENTIDADE_ENERGIA_GASTO_ANDAR + Constants.ENTIDADE_ENERGIA_GASTO_VIVER))) {
       morre();
     }
   }
@@ -219,6 +217,10 @@ public class AgenteDecepticons extends Agente
       xEnergia = x;
       yEnergia = y;
       recebeuSinalEnergia = true;
+    }
+
+    if (msg.contains("[ID]")) {
+      agenteIds.addAll(Arrays.asList(msg.split("-")[1]));
     }
   }
   
