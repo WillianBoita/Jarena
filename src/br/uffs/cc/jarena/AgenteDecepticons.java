@@ -38,6 +38,7 @@ public class AgenteDecepticons extends Agente
   private ArrayList<String> agenteIds = new ArrayList<>();
 	private boolean posicionou = false;
   private boolean sinalizouId = false;
+  private boolean sinalizado = false;
 
   private boolean comandante;
 	private boolean soldadoBorda;
@@ -51,10 +52,6 @@ public class AgenteDecepticons extends Agente
  
   public AgenteDecepticons(Integer x, Integer y, Integer energia) {
     super(x, y, energia);
-
-		if (agenteId == 2 || agenteId == 3 || agenteId == 4 || agenteId == 5) {
-			soldadoBorda = true;
-		}
  
 	 	if (getX() == 0 && getY() == 0) {
 			xEnergia = LIMITE_LARGURA_ESQUERDA;
@@ -83,6 +80,19 @@ public class AgenteDecepticons extends Agente
     if (!sinalizouId) {
       enviaMensagem("[ID] -" + getId());
       sinalizouId = true;
+    }
+
+    if (sinalizouId && !sinalizado) {
+      System.out.println("LISTA: " + agenteIds);
+      int indice = agenteIds.indexOf(String.valueOf(getId()));
+
+      if (indice == 0) {
+          comandante = true;
+      } else if (indice > 0 && indice < 5) {
+          soldadoBorda = true;
+      }
+      
+      sinalizado = true;
     }
  
     if(posicionou) {
