@@ -24,10 +24,8 @@ import java.util.Arrays;
  
 public class AgenteDecepticons extends Agente
 {
-  // não pode variável static :(
-  // reescrever toda a lógica do comandante e dos soldados, encontrar uma maneira de descobrir o id de cada um.
-  // tentar tirar vantagem do spawn onde todos estão juntos, cada um manda um id.
-  // ideia, criar vetor de ids, e povoar com mensagens recebidas de cada agente.
+
+  // quando divide um agente, ele cria um comandante novo. Enviar mensagens aos companheiros para validar se é um comandante.
 
 	private int LIMITE_LARGURA_DIREITA = (int)(Constants.LARGURA_TELA * 0.95) - 45;
 	private int LIMITE_LARGURA_ESQUERDA = 27;
@@ -35,7 +33,7 @@ public class AgenteDecepticons extends Agente
 	private int LIMITE_ALTURA_BAIXO = (int)(Constants.ALTURA_TELA * 0.95) - 22;
 
 	private int agenteId;
-  private ArrayList<String> agenteIds = new ArrayList<>();
+  private ArrayList<String> agenteIds = new ArrayList<>(getId());
 	private boolean posicionou = false;
   private boolean sinalizouId = false;
   private boolean sinalizado = false;
@@ -100,12 +98,12 @@ public class AgenteDecepticons extends Agente
       }
 
       if (fugindo && comandante) {
-      if (Math.random() > 0.5) {
-        moverPara(getX(), getY() + Constants.ENTIDADE_VELOCIDADE);
-      } else {
-        moverPara(getX() + Constants.ENTIDADE_VELOCIDADE, getY());
+        if (Math.random() > 0.5) {
+          moverPara(getX(), getY() + Constants.ENTIDADE_VELOCIDADE);
+        } else {
+          moverPara(getX() + Constants.ENTIDADE_VELOCIDADE, getY());
+        }
       }
-    }
   
       if (!recebendoEnergia) {
         if (xEnergia != -1 && yEnergia != -1) {
@@ -170,8 +168,10 @@ public class AgenteDecepticons extends Agente
     setDirecao(NENHUMA_DIRECAO);
     recebendoEnergia = true;
     emPosicao = false;
-    enviaMensagem(getId() + " [ENERGIA] posição: " + getX() + "," + getY());
-		if (!comandante && podeDividir() && getEnergia() > 600) {
+    if (!comandante) {
+      enviaMensagem(getId() + " [ENERGIA] posição: " + getX() + "," + getY());
+    }
+		if (!comandante && podeDividir() && getEnergia() > 800) {
 			divide();
 		}
   }
@@ -211,13 +211,19 @@ public class AgenteDecepticons extends Agente
   }
   
   public void recebeuMensagem(String msg) {
-    if (msg.contains("[ENERGIA]") && !recebendoEnergia && !comandante) {
+    if (msg.contains("[ENERGIA]") && !recebendoEnergia) {
       String[] posicao = msg.split(":")[1].split(",");
       int x = Integer.parseInt(posicao[0].trim());
       int y = Integer.parseInt(posicao[1].trim());
-      xEnergia = x;
-      yEnergia = y;
-      recebeuSinalEnergia = true;
+      if (comandante && calcularDistancia(x, y) <= 7) {
+        xEnergia = x;
+        yEnergia = y;
+        recebeuSinalEnergia = true;
+      } else {
+        xEnergia = x;
+        yEnergia = y;
+        recebeuSinalEnergia = true;
+      }
     }
 
     if (msg.contains("[ID]")) {
@@ -260,6 +266,13 @@ public class AgenteDecepticons extends Agente
     if (podeMoverPara(direcao)) {
 			setDirecao(direcao);
     }
+  }
+
+  private int calcularDistancia(int xDestino, int yDestino) {
+    int x = Math.abs(getX() - xDestino);
+    int y = Math.abs(getY() - yDestino);
+
+    return (int)Math.sqrt(x*x + y*y);
   }
  
   private boolean estaNoMeio() {
