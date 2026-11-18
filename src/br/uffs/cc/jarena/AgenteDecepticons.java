@@ -83,7 +83,6 @@ public class AgenteDecepticons extends Agente
     }
 
     if (sinalizouId && !sinalizado) {
-      System.out.println("LISTA: " + agenteIds);
       int indice = agenteIds.indexOf(String.valueOf(getId()));
 
       if (indice == 0) {
@@ -101,15 +100,11 @@ public class AgenteDecepticons extends Agente
       }
 
       if (fugindo && comandante) {
-      System.out.println("comandante tentou fugir");
       if (Math.random() > 0.5) {
         moverPara(getX(), getY() + Constants.ENTIDADE_VELOCIDADE);
       } else {
         moverPara(getX() + Constants.ENTIDADE_VELOCIDADE, getY());
       }
-    } else {
-      setDirecao(NENHUMA_DIRECAO);
-      para();
     }
   
       if (!recebendoEnergia) {
@@ -119,11 +114,7 @@ public class AgenteDecepticons extends Agente
 				
         if (!comandante && !recebendoEnergia && !recebeuSinalEnergia) {
 					
-					if(!podeMoverPara(getDirecao()) && !isParado()) {
-						setDirecao(geraDirecaoAleatoria());
-					}
-
-					if (soldadoBorda && !podeMoverPara(getDirecao())) {
+					if(!podeMoverPara(getDirecao())) {
 						setDirecao(geraDirecaoAleatoria());
 					}
 
